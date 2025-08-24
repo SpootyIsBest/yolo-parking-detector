@@ -108,7 +108,7 @@ yolo-parking-detector/
 Licensed under **AGPL-3.0-only**. See [LICENSE](LICENSE).  
 If you run this software as a network service, you must provide full source (including Dockerfile and build instructions) to users of that service.  
 
-Model weights (`best.pt`) are included and were trained by **<Your Name/Org>** with rights for redistribution and commercial use. See [NOTICE.md](NOTICE.md) for third-party components (Ultralytics YOLOv8, PyTorch, OpenCV).  
+Model weights (`best.pt`) are included and were trained by **Krystof Dolecek** with rights for redistribution and commercial use. See [NOTICE.md](NOTICE.md) for third-party components (Ultralytics YOLOv8, PyTorch, OpenCV).  
 
 ---
 
