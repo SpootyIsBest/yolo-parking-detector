@@ -1,0 +1,9 @@
+# pin numpy first
+numpy<2
+
+# ultralytics + pytorch CPU
+ultralytics==8.2.103
+torch==2.2.2
+torchvision==0.17.2
+# (optional but common)
+opencv-python-headless<5
