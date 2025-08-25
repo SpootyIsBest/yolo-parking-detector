@@ -18,7 +18,7 @@ Runs fully inside Docker: provide input images in a folder, get structured JSON 
 
 ### 1. Build image
 ```bash
-git clone https://github.com/<your-username>/yolo-parking-detector.git
+git clone https://github.com/SpootyIsBest/yolo-parking-detector.git
 cd yolo-parking-detector
 docker build -t yolo-parking .
 ```
