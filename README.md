@@ -36,19 +36,37 @@ docker run --rm   -v "$(pwd)/data-in:/data-in:ro"   -v "$(pwd)/data-out:/data-ou
 
 Results:
 - JSON files in `data-out/` (mirroring the input tree)
-- `data-out/detection_summary.csv`
+- `data-out/detection_summary.json`
 
 ---
 
 ## 🔎 Example Output
 
-**`detection_summary.csv`**
+**`detection_summary.json`**
 ```
-Number_of_Signs,Image_Count
-0,12
-1,34
-2,7
-3,1
+{
+    "summary": {
+        "total_images": 401,
+        "confidence_threshold": 0.5,
+        "distribution": [
+            {
+                "signs": 0,
+                "image_count": 13
+            },
+            {
+                "signs": 1,
+                "image_count": 371
+            },
+            {
+                "signs": 2,
+                "image_count": 17
+            }
+        ]
+    },
+    "config": {
+        "model_path": "best.pt"
+    }
+}
 ```
 
 **JSON (per image)**
