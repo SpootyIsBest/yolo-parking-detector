@@ -1,14 +1,14 @@
 # 🚦 YOLO Parking Sign Detector
 
 Detects **Slovakian parking signs** in images using [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics).  
-Runs fully inside Docker: provide input images in a folder, get structured JSON + a CSV summary out.  
+Runs fully inside Docker: provide input images in a folder, get structured JSON + a JSON summary out.  
 
 ---
 
 ## ✨ Features
 - Recursive folder scanning under `/data-in`
 - Per-image JSON outputs with bounding boxes & metadata
-- Aggregate CSV summary (`detection_summary.csv`)
+- Aggregate JSON summary (`detection_summary.json`)
 - Works out-of-the-box with Docker
 - Self-contained: ships with trained `best.pt` weights
 
