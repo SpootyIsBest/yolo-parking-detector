@@ -155,8 +155,9 @@ docker run --rm \
 ## 📂 Project Structure
 ```
 yolo-parking-detector/
-├── app/main.py          # main detector script (JSON output, GPU toggle, summary toggle)
-├── best.pt              # trained YOLO weights (baked into image)
+├── app/
+│   ├── main.py          # main detector script (JSON output, GPU toggle, summary toggle)
+│   └── best.pt          # trained YOLO weights (baked into image)
 ├── Dockerfile           # container build
 ├── requirements.txt     # Python deps
 ├── LICENSE              # AGPL-3.0-only
