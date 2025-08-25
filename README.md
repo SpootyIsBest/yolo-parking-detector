@@ -11,6 +11,8 @@ Runs fully inside Docker: provide input images in a folder, get structured JSON 
 - Aggregate JSON summary (`detection_summary.json`)
 - Works out-of-the-box with Docker
 - Self-contained: ships with trained `best.pt` weights
+- Configurable confidence threshold and device (CPU/GPU)
+- Safe output cleaning (removes old results inside mounted folder without deleting the folder itself)
 
 ---
 
@@ -31,40 +33,55 @@ mkdir -p data-in data-out
 
 ### 3. Run detection
 ```bash
-docker run --rm   -v "$(pwd)/data-in:/data-in:ro"   -v "$(pwd)/data-out:/data-out"   yolo-parking
+docker run --rm \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  yolo-parking
 ```
 
 Results:
 - JSON files in `data-out/` (mirroring the input tree)
 - `data-out/detection_summary.json`
 
+### 4. Enable GPU (if available)
+On GPU-enabled machines with NVIDIA Docker runtime:
+```bash
+docker run --rm \
+  --gpus all \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  -e USE_GPU=true \
+  yolo-parking
+```
+
+On CPU-only (default, e.g. macOS):
+```bash
+docker run --rm \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  -e USE_GPU=false \
+  yolo-parking
+```
+
 ---
 
 ## 🔎 Example Output
 
 **`detection_summary.json`**
-```
+```json
 {
     "summary": {
         "total_images": 401,
         "confidence_threshold": 0.5,
+        "device": "cuda",
         "distribution": [
-            {
-                "signs": 0,
-                "image_count": 13
-            },
-            {
-                "signs": 1,
-                "image_count": 371
-            },
-            {
-                "signs": 2,
-                "image_count": 17
-            }
+            { "signs": 0, "image_count": 13 },
+            { "signs": 1, "image_count": 371 },
+            { "signs": 2, "image_count": 17 }
         ]
     },
     "config": {
-        "model_path": "best.pt"
+        "model_path": "/app/best.pt"
     }
 }
 ```
@@ -93,16 +110,22 @@ Results:
 
 Environment variables (overridable via `-e` in `docker run`):
 
-| Variable               | Default         | Description                        |
-|------------------------|-----------------|------------------------------------|
-| `MODEL_PATH`           | `/app/best.pt`  | Path to model weights              |
-| `CONFIDENCE_THRESHOLD` | `0.5`           | Minimum confidence for detections  |
-| `INPUT_ROOT`           | `/data-in`      | Input folder (mounted from host)   |
-| `OUTPUT_ROOT`          | `/data-out`     | Output folder (mounted from host)  |
+| Variable               | Default         | Description                          |
+|------------------------|-----------------|--------------------------------------|
+| `MODEL_PATH`           | `/app/best.pt`  | Path to model weights (inside image) |
+| `CONFIDENCE_THRESHOLD` | `0.5`           | Minimum confidence for detections    |
+| `INPUT_ROOT`           | `/data-in`      | Input folder (mounted from host)     |
+| `OUTPUT_ROOT`          | `/data-out`     | Output folder (mounted from host)    |
+| `USE_GPU`              | `false`         | Use GPU (`true`) or CPU (`false`)    |
 
 Example with threshold override:
 ```bash
-docker run --rm   -v "$(pwd)/data-in:/data-in:ro"   -v "$(pwd)/data-out:/data-out"   -e CONFIDENCE_THRESHOLD=0.6   yolo-parking
+docker run --rm \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  -e CONFIDENCE_THRESHOLD=0.6 \
+  -e USE_GPU=true \
+  yolo-parking
 ```
 
 ---
@@ -110,8 +133,8 @@ docker run --rm   -v "$(pwd)/data-in:/data-in:ro"   -v "$(pwd)/data-out:/data-ou
 ## 📂 Project Structure
 ```
 yolo-parking-detector/
-├── app/main.py          # main detector script
-├── best.pt              # trained YOLO weights
+├── app/main.py          # main detector script (JSON output, GPU toggle)
+├── best.pt              # trained YOLO weights (baked into image)
 ├── Dockerfile           # container build
 ├── requirements.txt     # Python deps
 ├── LICENSE              # AGPL-3.0-only
