@@ -1,14 +1,14 @@
 # 🚦 YOLO Parking Sign Detector
 
 Detects **Slovakian parking signs** in images using [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics).  
-Runs fully inside Docker: provide input images in a folder, get structured JSON + a JSON summary out.  
+Runs fully inside Docker: provide input images in a folder, get structured JSON + an optional JSON summary out.  
 
 ---
 
 ## ✨ Features
 - Recursive folder scanning under `/data-in`
 - Per-image JSON outputs with bounding boxes & metadata
-- Aggregate JSON summary (`detection_summary.json`)
+- Optional aggregate JSON summary (`detection_summary.json`) — disabled by default
 - Works out-of-the-box with Docker
 - Self-contained: ships with trained `best.pt` weights
 - Configurable confidence threshold and device (CPU/GPU)
@@ -41,7 +41,7 @@ docker run --rm \
 
 Results:
 - JSON files in `data-out/` (mirroring the input tree)
-- `data-out/detection_summary.json`
+- `detection_summary.json` (only if enabled)
 
 ### 4. Enable GPU (if available)
 On GPU-enabled machines with NVIDIA Docker runtime:
@@ -63,11 +63,31 @@ docker run --rm \
   yolo-parking
 ```
 
+### 5. Enable summary output
+By default the detection summary is not saved. Enable with:
+
+**Environment variable:**
+```bash
+docker run --rm \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  -e SAVE_SUMMARY=true \
+  yolo-parking
+```
+
+**Or CLI flag:**
+```bash
+docker run --rm \
+  -v "$(pwd)/data-in:/data-in:ro" \
+  -v "$(pwd)/data-out:/data-out" \
+  yolo-parking --save-summary
+```
+
 ---
 
 ## 🔎 Example Output
 
-**`detection_summary.json`**
+**`detection_summary.json`** (only if enabled)
 ```json
 {
     "summary": {
@@ -110,21 +130,23 @@ docker run --rm \
 
 Environment variables (overridable via `-e` in `docker run`):
 
-| Variable               | Default         | Description                          |
-|------------------------|-----------------|--------------------------------------|
-| `MODEL_PATH`           | `/app/best.pt`  | Path to model weights (inside image) |
-| `CONFIDENCE_THRESHOLD` | `0.5`           | Minimum confidence for detections    |
-| `INPUT_ROOT`           | `/data-in`      | Input folder (mounted from host)     |
-| `OUTPUT_ROOT`          | `/data-out`     | Output folder (mounted from host)    |
-| `USE_GPU`              | `false`         | Use GPU (`true`) or CPU (`false`)    |
+| Variable               | Default         | Description                                   |
+|------------------------|-----------------|-----------------------------------------------|
+| `MODEL_PATH`           | `/app/best.pt`  | Path to model weights (inside image)          |
+| `CONFIDENCE_THRESHOLD` | `0.5`           | Minimum confidence for detections             |
+| `INPUT_ROOT`           | `/data-in`      | Input folder (mounted from host)              |
+| `OUTPUT_ROOT`          | `/data-out`     | Output folder (mounted from host)             |
+| `USE_GPU`              | `false`         | Use GPU (`true`) or CPU (`false`)             |
+| `SAVE_SUMMARY`         | `false`         | Save detection_summary.json (`true` to enable)|
 
-Example with threshold override:
+Example with overrides:
 ```bash
 docker run --rm \
   -v "$(pwd)/data-in:/data-in:ro" \
   -v "$(pwd)/data-out:/data-out" \
   -e CONFIDENCE_THRESHOLD=0.6 \
   -e USE_GPU=true \
+  -e SAVE_SUMMARY=true \
   yolo-parking
 ```
 
@@ -133,7 +155,7 @@ docker run --rm \
 ## 📂 Project Structure
 ```
 yolo-parking-detector/
-├── app/main.py          # main detector script (JSON output, GPU toggle)
+├── app/main.py          # main detector script (JSON output, GPU toggle, summary toggle)
 ├── best.pt              # trained YOLO weights (baked into image)
 ├── Dockerfile           # container build
 ├── requirements.txt     # Python deps
